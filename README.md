@@ -1,1 +1,1 @@
-新奥燃气haos集成，需要用e城e家抓取token，理论上全国可用
+新奥燃气haos集成，需要用e城e家抓取token和deviceId，理论上全国可用，如果app里面没有小易智家可能会少一些数据，直接用windowlife大神的即可，https://github.com/windowlife/xinaogas 此版本在windowlife大神的基础上修改，把里面小易智家的数据也集成进去了，累计燃气用量和昨日燃气用量，感谢原作者！
