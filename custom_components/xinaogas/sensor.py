@@ -69,6 +69,54 @@ SENSORS: tuple[EcejGasSensorDescription, ...] = (
     EcejGasSensorDescription(key="meter_type", translation_key="meter_type", icon="mdi:meter-gas"),
     EcejGasSensorDescription(key="company_name", translation_key="company_name", icon="mdi:domain"),
     EcejGasSensorDescription(key="last_update_time", translation_key="last_update_time", icon="mdi:update"),
+    EcejGasSensorDescription(
+        key="accumulate_total",
+        translation_key="accumulate_total",
+        native_unit_of_measurement=UnitOfVolume.CUBIC_METERS,
+        icon="mdi:sigma",
+        state_class=SensorStateClass.TOTAL_INCREASING,
+    ),
+    EcejGasSensorDescription(
+        key="yesterday_gas_total",
+        translation_key="yesterday_gas_total",
+        native_unit_of_measurement=UnitOfVolume.CUBIC_METERS,
+        icon="mdi:calendar-arrow-left",
+        state_class=SensorStateClass.MEASUREMENT,
+    ),
+    # 新增：阀门状态
+    EcejGasSensorDescription(
+        key="valve_status",
+        translation_key="valve_status",
+        icon="mdi:valve",
+    ),
+    # 新增：设备状态（报警）
+    EcejGasSensorDescription(
+        key="alarm_status",
+        translation_key="alarm_status",
+        icon="mdi:shield-check",
+    ),
+    # 新增：电池电量
+    EcejGasSensorDescription(
+        key="electricity_status",
+        translation_key="electricity_status",
+        icon="mdi:battery",
+    ),
+    # 新增：近 7 天用量（传感器显示最新一天）
+    EcejGasSensorDescription(
+        key="week_usage",
+        translation_key="week_usage",
+        native_unit_of_measurement=UnitOfVolume.CUBIC_METERS,
+        icon="mdi:chart-bar",
+        state_class=SensorStateClass.MEASUREMENT,
+    ),
+    # 新增：近 12 个月用量（传感器显示最新一月）
+    EcejGasSensorDescription(
+        key="month_usage",
+        translation_key="month_usage",
+        native_unit_of_measurement=UnitOfVolume.CUBIC_METERS,
+        icon="mdi:chart-line",
+        state_class=SensorStateClass.MEASUREMENT,
+    ),
 )
 
 
@@ -127,5 +175,10 @@ class EcejGasSensor(CoordinatorEntity[EcejGasCoordinator], SensorEntity):
             "cityId": data.get("city_id"),
             "cardbindId": data.get("cardbind_id"),
             "platformOnlyCardNo": data.get("platform_only_card_no"),
+            "累计燃气用量": data.get("accumulate_total"),
+            "昨日燃气用量": data.get("yesterday_gas_total"),
+            # 图表数据
+            "近7天用气明细": data.get("week_statistic"),
+            "近12个月用气明细": data.get("month_statistic"),
         }
         return {key: value for key, value in attrs.items() if value not in (None, "", [], {})} or None
