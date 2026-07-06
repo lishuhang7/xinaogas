@@ -14,6 +14,8 @@ from .const import (
     CONF_CARDBIND_ID,
     CONF_CITY_ID,
     CONF_CITY_NAME,
+    CONF_DEVICE_ID,
+    CONF_DEVICE_TYPE,
     CONF_PLATFORM_ONLY_CARD_NO,
     CONF_TOKEN,
     CONF_UPDATE_INTERVAL,
@@ -193,9 +195,21 @@ class EcejGasConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 return await self.async_step_select_city()
             errors[CONF_CITY_SEARCH] = "invalid_city"
 
+        # 首次配置表单：增加设备信息字段（可选）
+        defaults = user_input or {}
+        city_name = defaults.get(CONF_CITY_NAME) or city_name_from_id(
+            str(defaults.get(CONF_CITY_ID, DEFAULT_CITY_ID)), DEFAULT_CITY_NAME
+        )
+        schema_dict = {
+            vol.Required(CONF_TOKEN, default=defaults.get(CONF_TOKEN, "")): str,
+            vol.Required(CONF_CITY_SEARCH, default=defaults.get(CONF_CITY_SEARCH, city_name)): str,
+            vol.Optional(CONF_DEVICE_ID, default=defaults.get(CONF_DEVICE_ID, "")): str,
+            vol.Optional(CONF_DEVICE_TYPE, default=defaults.get(CONF_DEVICE_TYPE, "3")): str,
+        }
+
         return self.async_show_form(
             step_id="user",
-            data_schema=_search_schema(user_input),
+            data_schema=vol.Schema(schema_dict),
             errors=errors,
         )
 
@@ -268,6 +282,8 @@ class EcejGasConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         data[CONF_CARDBIND_ID] = _cardbind_id(card)
         data[CONF_PLATFORM_ONLY_CARD_NO] = _platform_card_no(card)
 
+        # 设备字段已在 self._pending 中保留，可直接使用
+
         try:
             gas_data = await _validate_input(self.hass, data)
         except EcejGasAuthError:
@@ -314,6 +330,8 @@ class EcejGasOptionsFlow(config_entries.OptionsFlow):
                 CONF_UPDATE_INTERVAL,
                 entry.data.get(CONF_UPDATE_INTERVAL, DEFAULT_UPDATE_INTERVAL_MINUTES),
             ),
+            CONF_DEVICE_ID: entry.options.get(CONF_DEVICE_ID, entry.data.get(CONF_DEVICE_ID, "")),
+            CONF_DEVICE_TYPE: entry.options.get(CONF_DEVICE_TYPE, entry.data.get(CONF_DEVICE_TYPE, "3")),
         }
 
     async def async_step_init(self, user_input: dict[str, Any] | None = None):
@@ -328,9 +346,25 @@ class EcejGasOptionsFlow(config_entries.OptionsFlow):
                 return await self.async_step_select_city()
             errors[CONF_CITY_SEARCH] = "invalid_city"
 
+        defaults = user_input or current
+        city_name = defaults.get(CONF_CITY_NAME) or city_name_from_id(
+            str(defaults.get(CONF_CITY_ID, DEFAULT_CITY_ID)), DEFAULT_CITY_NAME
+        )
+
+        schema_dict = {
+            vol.Required(CONF_TOKEN, default=defaults.get(CONF_TOKEN, "")): str,
+            vol.Required(CONF_CITY_SEARCH, default=defaults.get(CONF_CITY_SEARCH, city_name)): str,
+            vol.Required(
+                CONF_UPDATE_INTERVAL,
+                default=defaults.get(CONF_UPDATE_INTERVAL, DEFAULT_UPDATE_INTERVAL_MINUTES),
+            ): vol.All(vol.Coerce(int), vol.Range(min=10, max=10080)),
+            vol.Optional(CONF_DEVICE_ID, default=defaults.get(CONF_DEVICE_ID, "")): str,
+            vol.Optional(CONF_DEVICE_TYPE, default=defaults.get(CONF_DEVICE_TYPE, "3")): str,
+        }
+
         return self.async_show_form(
             step_id="init",
-            data_schema=_search_schema(user_input or current, include_interval=True),
+            data_schema=vol.Schema(schema_dict),
             errors=errors,
         )
 
