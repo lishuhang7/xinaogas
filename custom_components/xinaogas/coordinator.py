@@ -13,6 +13,8 @@ from .api import EcejGasApi, EcejGasApiError
 from .const import (
     CONF_CITY_ID,
     CONF_CITY_NAME,
+    CONF_DEVICE_ID,
+    CONF_DEVICE_TYPE,
     CONF_TOKEN,
     CONF_UPDATE_INTERVAL,
     DEFAULT_CITY_ID,
@@ -33,6 +35,8 @@ class EcejGasCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             self._get_value(entry, CONF_CITY_ID, DEFAULT_CITY_ID),
             self._get_value(entry, "cardbind_id"),
             self._get_value(entry, "platform_only_card_no"),
+            self._get_value(entry, CONF_DEVICE_ID, ""),
+            self._get_value(entry, CONF_DEVICE_TYPE, "3"),
         )
         update_minutes = int(
             entry.options.get(
