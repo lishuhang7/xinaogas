@@ -41,11 +41,13 @@
     "step": {
       "init": {
         "title": "新奥燃气设置",
-        "description": "可更新 App token、城市、燃气户号和刷新间隔。",
+        "description": "可更新 App token、城市、燃气户号和刷新间隔。可选填设备信息以获取累计/昨日用量。",
         "data": {
           "token": "Token",
           "city_search": "城市搜索",
-          "update_interval": "刷新间隔（分钟）"
+          "update_interval": "刷新间隔（分钟）",
+          "device_id": "设备 ID",
+          "device_type": "设备类型"
         }
       },
       "select_city": {
@@ -115,6 +117,27 @@
       },
       "latest_bill_amount": {
         "name": "最近账单金额"
+      },
+      "accumulate_total": {
+        "name": "累计燃气用量"
+      },
+      "yesterday_gas_total": {
+        "name": "昨日燃气用量"
+      },
+      "valve_status": {
+        "name": "阀门状态"
+      },
+      "alarm_status": {
+        "name": "设备状态"
+      },
+      "electricity_status": {
+        "name": "电池电量"
+      },
+      "week_usage": {
+        "name": "近7天用量"
+      },
+      "month_usage": {
+        "name": "近12个月用量"
       }
     }
   }
